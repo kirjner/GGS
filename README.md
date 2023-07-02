@@ -47,7 +47,7 @@ Running ```ggs/train_predictor.py``` uses the config file ```configs/train_predi
 Any generated data files or checkpoints will be saved in the appropriate sub-directories. Currently, the name of the deepest sub-directory is the date of the run. The date is also present in the names of generated files/folders for the other experiment types when running their respective commands.
 
 ### Smoothing (**GS**)
-Given an unsmoothed predictor, implements **GS**, outputting a 'smoothed.csv' file that can be used to then train a smoothed predictor. Currently, the experiment files in ```configs/experiment/GS``` use the appropriate (unsmoothed) ```last.ckpt``` file. Be sure to replace this checkpoint if you train a new unsmoothed predictor. It's also necessary that the folder containing the ```last.ckpt``` has a corresponding ```config.yaml```
+Given an unsmoothed predictor, implements **GS**, outputting a _smoothed.csv_ file that can be used to then train a smoothed predictor. Currently, the experiment files in ```configs/experiment/GS``` use the appropriate (unsmoothed) ```last.ckpt``` file. Be sure to replace this checkpoint if you train a new unsmoothed predictor. It's also necessary that the folder containing the ```last.ckpt``` has a corresponding ```config.yaml```
 - Experiments: AAV-easy, AAV-medium, AAV-hard, GFP-easy, GFP-medium, GFP-hard
 
 To execute **GS**, run the following command
