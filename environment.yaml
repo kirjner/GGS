@@ -1,4 +1,4 @@
-name: ggs-test
+name: ggs
 channels:
   - conda-forge
   - pytorch
