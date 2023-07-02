@@ -1,0 +1,1 @@
+predictor_dir: ${paths.ckpt_dir}/AAV/mutations_6/percentile_0.2_0.4/unsmoothed/predictor

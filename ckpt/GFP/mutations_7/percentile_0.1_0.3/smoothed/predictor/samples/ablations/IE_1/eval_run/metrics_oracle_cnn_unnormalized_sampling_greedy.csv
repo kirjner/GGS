@@ -1,0 +1,6 @@
+num_unique,mean_fitness,median_fitness,std_fitness,max_fitness,mean_diversity,mean_novelty,median_novelty,source_path
+128,1.5158596,1.4755261,0.31501088,2.5272608,13.44783464566929,1.0,1.0,/home/gridsan/akirjner/protein_design/BiGGS/ckpt/GFP/mutations_7/percentile_0.1_0.3/smoothed/predictor/samples/IE_1/seed_4.csv
+128,1.5021362,1.4737575,0.3262139,2.5272608,13.408464566929133,1.0,1.0,/home/gridsan/akirjner/protein_design/BiGGS/ckpt/GFP/mutations_7/percentile_0.1_0.3/smoothed/predictor/samples/IE_1/seed_3.csv
+128,1.5079443,1.47437,0.33388117,2.5272608,13.482652559055119,1.0,1.0,/home/gridsan/akirjner/protein_design/BiGGS/ckpt/GFP/mutations_7/percentile_0.1_0.3/smoothed/predictor/samples/IE_1/seed_2.csv
+128,1.5116434,1.4686669,0.3452501,2.5272608,13.479699803149606,1.0,1.0,/home/gridsan/akirjner/protein_design/BiGGS/ckpt/GFP/mutations_7/percentile_0.1_0.3/smoothed/predictor/samples/IE_1/seed_5.csv
+128,1.4986055,1.4607506,0.33257145,2.5272608,13.47367125984252,1.0,1.0,/home/gridsan/akirjner/protein_design/BiGGS/ckpt/GFP/mutations_7/percentile_0.1_0.3/smoothed/predictor/samples/IE_1/seed_1.csv

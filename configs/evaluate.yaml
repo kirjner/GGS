@@ -1,0 +1,22 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - paths: default.yaml
+  - extras: default.yaml
+  - experiment: null # needs command line override
+  #- override hydra/launcher: joblib
+
+runner:
+  batch_size: 128
+  base_pool_path: null
+  oracle: db
+  gt_csv: ${experiment.gt_csv}
+  oracle_dir: ${experiment.oracle_dir}
+  predictor_dir: ${experiment.predictor_dir}
+  use_normalization: True
+
+
+
+
+

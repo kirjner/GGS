@@ -1,0 +1,5 @@
+predictor_dir: ${paths.ckpt_dir}/GFP/mutations_6/percentile_0.2_0.4/unsmoothed/predictor
+temperature: 0.01
+gibbs_samples: 100
+verbose: False
+ckpt_name: predictor.ckpt

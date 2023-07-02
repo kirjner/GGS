@@ -1,0 +1,11 @@
+predictor_dir: ${paths.ckpt_dir}/AAV/mutations_7/percentile_0.1_0.3/unsmoothed/predictor
+criterion: mh  # absolute or mh
+edit_tolerance: 0.03
+residue_temperature: [0.01] 
+aa_temperature: [0.01] 
+use_gwg: False
+hamming_distance: [1, 2, 3, 4, 5]
+gibbs_samples: 100
+use_hessian: False
+verbose: False
+ckpt_name: predictor.ckpt

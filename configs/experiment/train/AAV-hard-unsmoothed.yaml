@@ -1,0 +1,15 @@
+seq_len: 28
+task: AAV
+aav:
+  csv_path: ${paths.data_dir}/AAV/ground_truth.csv
+  output_dir: ${paths.data_dir}/AAV/
+  filter_percentile: [0.1, 0.3]
+  min_mutant_dist: 7
+  top_quantile: 0.99
+  use_levenshtein: True
+  use_neg_data: False
+  smoothed_data_fname: null
+
+  
+
+ 

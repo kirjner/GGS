@@ -1,0 +1,10 @@
+task: AAV
+method: ggs 
+results_name: eval_run
+topk: 128
+gt_csv: ${paths.data_dir}/AAV/ground_truth.csv
+oracle_dir: ${paths.ckpt_dir}/AAV/mutations_0/percentile_0.0_1.0/
+ggs_samples_dir: ${paths.ckpt_dir}/AAV/mutations_7/percentile_0.1_0.3/unsmoothed/ #...  needs to be filled with the samples from an appropriate trained predictor
+predictor_dir: null
+topk_sampling: greedy
+epoch_filter: null

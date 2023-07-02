@@ -1,0 +1,10 @@
+task: AAV
+method: ggs 
+results_name: eval_run
+topk: 128
+gt_csv: ${paths.data_dir}/AAV/ground_truth.csv
+oracle_dir: ${paths.ckpt_dir}/AAV/mutations_0/percentile_0.0_1.0/
+ggs_samples_dir: ${paths.ckpt_dir}/AAV/mutations_6/percentile_0.2_0.4/unsmoothed/predictor/samples/IE_15
+predictor_dir: null
+topk_sampling: greedy
+epoch_filter: null

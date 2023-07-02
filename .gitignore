@@ -1,0 +1,7 @@
+logs/**
+outputs/**
+ggs.egg-info/**
+*.log
+*__pycache__*
+wandb/**
+

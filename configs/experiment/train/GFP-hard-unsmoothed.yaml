@@ -1,0 +1,14 @@
+seq_len: 237
+task: GFP
+gfp:
+  csv_path: ${paths.data_dir}/GFP/ground_truth.csv
+  output_dir: ${paths.data_dir}/GFP/
+  filter_percentile: [0.1, 0.3]
+  min_mutant_dist: 7
+  top_quantile: 0.99
+  use_levenshtein: True
+  use_neg_data: True
+  smoothed_data_fname: null
+
+  
+

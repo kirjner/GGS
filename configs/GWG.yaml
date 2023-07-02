@@ -1,0 +1,26 @@
+# @package _global_
+
+# specify here default configuration
+# order of defaults determines the order in which configs override each other
+defaults:
+  - _self_
+  - paths: default.yaml
+  - extras: default.yaml
+  - hydra: default.yaml
+  - experiment: null # needs command line override
+  - debug: null
+  - optional local: default
+
+data:
+  csv_path: null # (!!) must be null
+  cluster_cutoff: 500
+  max_visits: 1
+
+run:
+  max_epochs: 22
+  run_name: run_${now:%Y-%m-%d}_${now:%H-%M-%S} #IE_${run.max_epochs}  -- use this name if you don't want the date, but instead the number of epochs
+  debug: False
+  seed: 1
+
+# task name, determines output directory path
+task_name: GWG
