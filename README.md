@@ -11,7 +11,7 @@ This codebase implements Gibbs sampling with Graph-based Smoothing (GGS)
 You can install GGS by following the steps below:
 
 ```bash
-clone the repository
+#clone the repository
 git clone https://github.com/kirjner/GGS.git
 
 # Navigate into the unzipped directory
