@@ -67,7 +67,7 @@ python ggs/GWG.py experiment=generate/GFP-hard-unsmoothed
 ```
 Samples will be saved to the same folder that contains ```last.ckpt```
 
-### Evaluating (samples 128 candidates)
+### Evaluating 
 Given a predictor and samples, extract the best 128 candidates according to that predictor, and evaluate them based on the metrics from the manuscript: (normalized) fitness according to the oracle, diversity, and novelty. Requires training to have been run for the corresponding experiment samples as well as predictor and samples to be in the same directory. If using a new set of samples/predictor, make sure to replace the path in the appropriate experiment config file in ```configs/experiment/evaluate```
 - Experiments: AAV-easy-smoothed, AAV-easy-unsmoothed, AAV-medium-smoothed, AAV-medium-unsmoothed, AAV-hard-smoothed, AAV-hard-unsmoothed, GFP-easy-smoothed, GFP-easy-unsmoothed, GFP-medium-smoothed, GFP-medium-unsmoothed, GFP-hard-smoothed, GFP-hard-unsmoothed
 
