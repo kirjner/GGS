@@ -1,5 +1,5 @@
 # GGS
-This codebase implements Gibbs sampling with Graph-based Smoothing (GGS)
+This codebase implements Gibbs sampling with Graph-based Smoothing (GGS). [arxiv](https://arxiv.org/abs/2307.00494)
 
 **Note:**
 1. The current version of GGS requires a GPU to run.
