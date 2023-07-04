@@ -1,4 +1,4 @@
-# BiGGS
+# GGS
 This codebase implements Gibbs sampling with Graph-based Smoothing (GGS)
 
 **Note:**
