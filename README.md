@@ -2,10 +2,10 @@
 This codebase implements Gibbs sampling with Graph-based Smoothing (GGS). [arxiv](https://arxiv.org/abs/2307.00494)
 
 **Note:**
-1. The current version of GGS requires a GPU to run.
+1. The current version of GGS requires a GPU to run. The current environment.yaml file install will only for a linux machine due to the GPU requirement.
 2. To perform Graph-based Smoothing (GS), installation of the [PETSc](https://petsc.org/) and [SLEPc](https://slepc.upv.es/) libraries is required. Appropriate versions are included in the environment.yml file. Consult the previous links for further instructions.
 3. The trained predictors (smoothed and unsmoothed) for both AAV and GFP across all difficulties that were used to generate the results in the manuscript are available in the 'ckpt' directory
-4. **The current environment.yaml file contains builds for a linux machine**. Yaml files for other OSes are coming soon.
+
 
 ## Installation
 
