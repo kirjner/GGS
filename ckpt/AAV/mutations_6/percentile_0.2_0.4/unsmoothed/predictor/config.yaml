@@ -88,6 +88,6 @@ experiment:
     - 0.4
     min_mutant_dist: 6
     top_quantile: 0.99
-    use_levenshtein: true
-    use_neg_data: false
+    
+    
     smoothed_data_fname: null

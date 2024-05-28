@@ -2,12 +2,13 @@ seq_len: 237
 task: GFP
 gfp:
   csv_path: ${paths.data_dir}/GFP/ground_truth.csv
-  output_dir: ${paths.data_dir}/GFP/
+  task_dir: ${paths.data_dir}/GFP/
   filter_percentile: [0.2, 0.4]
   min_mutant_dist: 6
   top_quantile: 0.99
-  use_levenshtein: True
-  use_neg_data: False
-  smoothed_data_fname: smoothed_data.csv
+  smoothing_params: tik-gamma-1 #for example
+  nbhd_params: ham1_n-250K #for example
+  smoothed_fname: results #for example
+  output_dir: null #one extra layer for naming different runs with the same parameters. Defaults to a timestamp
 
 

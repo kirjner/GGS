@@ -1,1 +1,5 @@
-predictor_dir: ${paths.ckpt_dir}/AAV/mutations_7/percentile_0.1_0.3/unsmoothed/predictor
+predictor_dir: null # needs to be filled in by user
+save_laplacian: False
+random_seed: 42
+laplacian_path: null
+

@@ -1,6 +1,0 @@
-num_unique,mean_fitness,median_fitness,std_fitness,max_fitness,mean_diversity,mean_novelty,median_novelty,source_path
-128,0.599896842148155,0.6155355870723724,0.08739507334663281,0.73546302318573,2.498277559055118,5.1171875,5.0,/home/gridsan/akirjner/protein_design/GGS/ckpt//AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/use_gwg_good_mh/seed_4.csv
-128,0.6047019136603922,0.6167412102222443,0.0834494116316966,0.7390112280845642,2.5075049212598426,5.1796875,5.0,/home/gridsan/akirjner/protein_design/GGS/ckpt//AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/use_gwg_good_mh/seed_3.csv
-128,0.5957421294879168,0.613275945186615,0.09298823295576913,0.7390112280845642,2.501845472440945,5.125,5.0,/home/gridsan/akirjner/protein_design/GGS/ckpt//AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/use_gwg_good_mh/seed_2.csv
-128,0.6025179736316204,0.6201965510845184,0.0873583253255528,0.73546302318573,2.534202755905512,5.1171875,5.0,/home/gridsan/akirjner/protein_design/GGS/ckpt//AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/use_gwg_good_mh/seed_5.csv
-128,0.6000379836186767,0.6178267300128937,0.09080819819543708,0.7390112280845642,2.4921259842519685,5.1484375,5.0,/home/gridsan/akirjner/protein_design/GGS/ckpt//AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/use_gwg_good_mh/seed_1.csv

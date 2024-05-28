@@ -10,7 +10,7 @@ defaults:
 runner:
   batch_size: 128
   base_pool_path: null
-  oracle: db
+  oracle: cnn
   gt_csv: ${experiment.gt_csv}
   oracle_dir: ${experiment.oracle_dir}
   predictor_dir: ${experiment.predictor_dir}

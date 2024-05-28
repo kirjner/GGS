@@ -1,5 +1,5 @@
-predictor_dir: ${paths.ckpt_dir}/AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor
-temperature: 0.01
+predictor_dir: null # needs to be filled in by user
+temperature: 0.1
 gibbs_samples: 100
 verbose: False
-ckpt_name: last.ckpt
+ckpt_name: predictor.ckpt

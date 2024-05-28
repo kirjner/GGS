@@ -100,6 +100,23 @@ class BaseCNN(nn.Module):
         # decoder
         output = self.decoder(x).squeeze(1)
         return output
+    
+# A Dense MLP with (n_layers) layers that takes in a binary vector and outputs a scalar
+class ToyMLP(nn.Module):
+    def __init__(self, seq_len, n_layers=1, hidden_size=256, **kwargs):
+        super(ToyMLP, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(nn.Linear(seq_len, hidden_size))
+        for i in range(n_layers-1):
+            self.layers.append(nn.Linear(hidden_size, hidden_size))
+        self.layers.append(nn.Linear(hidden_size, 1))
+        self.act_fn = nn.ReLU()
+
+    def forward(self, x):
+        for layer in self.layers[:-1]:
+            x = self.act_fn(layer(x))
+        x = self.layers[-1](x)
+        return x
 
 
 

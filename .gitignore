@@ -1,7 +1,14 @@
+#hydra things
 logs/**
 outputs/**
+multirun/**
+#others
 ggs.egg-info/**
 *.log
 *__pycache__*
 wandb/**
-
+ckpt/*/extra/
+ckpt/*/old/
+notebooks/
+*.DS_Store*
+bash

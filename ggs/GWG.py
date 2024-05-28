@@ -13,25 +13,9 @@ import pandas as pd
 import torch
 from ggs.models.GWG_module import GwgPairSampler
 from ggs.data.sequence_dataset import PreScoredSequenceDataset
+import pickle as pkl
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
-# ------------------------------------------------------------------------------------ #
-# the setup_root above is equivalent to:
-# - adding project root dir to PYTHONPATH
-#       (so you don't need to force user to install project as a package)
-#       (necessary before importing any local modules e.g. `from src import utils`)
-# - setting up PROJECT_ROOT environment variable
-#       (which is used as a base for paths in "configs/paths/default.yaml")
-#       (this way all filepaths are the same no matter where you run the code)
-# - loading environment variables from ".env" in root dir
-#
-# you can remove it if you:
-# 1. either install project as a package or move entry files to project root dir
-# 2. set `root_dir` to "." in "configs/paths/default.yaml"
-#
-# more info: https://github.com/ashleve/pyrootutils
-# ------------------------------------------------------------------------------------ #
-
 from ggs import utils
 
 log = utils.get_pylogger(__name__)
@@ -62,11 +46,13 @@ def _worker_fn(args):
         **exp_cfg,
         device=f"cuda:0"
     )
-    all_outputs = []
+    all_candidates, all_acceptance_rates = [], []
     for batch in inputs:
-        all_outputs.append(model(batch))
+        candidates, acceptance_rate = model(batch)
+        all_candidates.append(candidates)
+        all_acceptance_rates.append(acceptance_rate)
     log.info(f'Done with worker: {worker_i}')
-    return all_outputs
+    return all_candidates, all_acceptance_rates
 
 def _setup_dataset(cfg):
     if cfg.data.csv_path is not None:
@@ -79,7 +65,6 @@ def _setup_dataset(cfg):
     cfg.data.csv_path = os.path.join(data_dir, 'base_seqs.csv')
     if not os.path.exists(cfg.data.csv_path):
         raise ValueError(f'Could not find dataset at {cfg.data.csv_path}.')
-
     return PreScoredSequenceDataset(**cfg.data)
 
 def generate_pairs(cfg: DictConfig, sample_write_path: str) -> Tuple[dict, dict]:
@@ -97,6 +82,7 @@ def generate_pairs(cfg: DictConfig, sample_write_path: str) -> Tuple[dict, dict]
     exp_cfg = dict(cfg.experiment)
     epoch = 0
     start_time = time.time()
+    acceptance_rates = []
     while epoch < run_cfg.max_epochs and len(dataset):
         epoch += 1
         epoch_start_time = time.time()
@@ -120,30 +106,42 @@ def generate_pairs(cfg: DictConfig, sample_write_path: str) -> Tuple[dict, dict]
         # Process results.
         epoch_pair_count = 0
         candidate_seqs = []
-        for worker_results in all_worker_outputs:
+
+        for worker_results, acceptance_rate in all_worker_outputs:
             for new_pairs in worker_results:
                 if new_pairs is None:
                     continue
+            
                 candidate_seqs.append(
-                    new_pairs[['mutant_sequences', 'mutant_scores']].rename(
-                        columns={'mutant_sequences': 'sequences', 'mutant_scores': 'scores'}
+                    new_pairs[['mutant_sequence', 'mutant_score']].rename(
+                        columns={'mutant_sequence': 'sequence', 'mutant_score': 'score'}
                     )
                 )
-                epoch_pair_count += dataset.add_pairs(new_pairs, epoch)
+            acceptance_rates.append(acceptance_rate[0])
+            epoch_pair_count += dataset.add_pairs(new_pairs, epoch)
         if len(candidate_seqs) > 0:
             candidate_seqs = pd.concat(candidate_seqs)
-            candidate_seqs.drop_duplicates(subset='sequences', inplace=True)
+            candidate_seqs.drop_duplicates(subset='sequence', inplace=True)
         epoch_elapsed_time = time.time() - epoch_start_time
 
         log.info(f"Epoch {epoch} finished in {epoch_elapsed_time:.2f} seconds")
         log.info("------------------------------------")
         log.info(f"Generated {epoch_pair_count} pairs in this epoch")
+        log.info(f"Acceptance rate = {acceptance_rate[0]:.2f}")
         dataset.reset()
-        if epoch < run_cfg.max_epochs and len(candidate_seqs) > 0:
+        if epoch < run_cfg.max_epochs and len(candidate_seqs) > 1:
             dataset.add(candidate_seqs)
-            dataset.cluster()
+            if cfg.data.clustering:
+                dataset.cluster()
         log.info(f"Next dataset = {len(dataset)} sequences")
     dataset.pairs.to_csv(sample_write_path, index=False)
+    # save acceptance_rates to pkl
+    cluster_centers_path = sample_write_path.replace('.csv', '_cluster_centers.csv')
+    dataset._cluster_centers.to_csv(cluster_centers_path, index=False)
+    acceptance_rates_path = sample_write_path.replace('.csv', '_acceptance_rates.pkl')
+    with open(acceptance_rates_path, 'wb') as f:
+        pkl.dump(acceptance_rates, f)
+        
     elapsed_time = time.time() - start_time
     log.info(f'Finished generation in {elapsed_time:.2f} seconds.')
     log.info(f'Samples written to {sample_write_path}.')

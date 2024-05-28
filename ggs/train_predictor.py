@@ -47,25 +47,24 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
     # Set-up data
     if cfg.data.task == 'GFP':
         task_cfg = cfg.experiment.gfp
-        filter_range = task_cfg.filter_percentile
     elif cfg.data.task == 'AAV':
         task_cfg = cfg.experiment.aav
-        filter_range = task_cfg.filter_percentile
     else:
         raise ValueError(f"Unknown task: {cfg.data.task}")
+    filter_range = task_cfg.filter_percentile
     log.info(f'Training predictor on task {cfg.data.task}')
     datamodule: LightningDataModule = PredictorDataModule(
         **cfg.data,
         task_cfg=task_cfg,
     )
-
+    
     write_path = datamodule._dataset._write_path
     log.info(
         f"Preprocessed base sequences has saved to {write_path}.")
 
-    if cfg.debug:
+    if cfg.debug or not cfg.log:
         logger = None
-        log.info("Debug mode! Not logging to wandb...")
+        log.info("Not logging to wandb...")
     else:
         log.info("Instantiating loggers...")
         if cfg.wandb.name is None:
@@ -83,17 +82,21 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 
     callbacks_cfg = cfg.callbacks
     percentile = '_'.join([str(x) for x in filter_range])
-    timestamp = datetime.now().strftime("%dD_%mM_%YY_%Hh_%Mm_%Ss")
-    smoothed = 'smoothed' if task_cfg.smoothed_data_fname else 'unsmoothed'
+    
+    smoothing_params = task_cfg.smoothing_params
+    nbhd_params = task_cfg.nbhd_params if task_cfg.nbhd_params else ''
+    output_dir = task_cfg.output_dir if task_cfg.output_dir else datetime.now().strftime("%m_%d_%Y_%H_%M") 
+    
     ckpt_dir = os.path.join(
         callbacks_cfg.model_checkpoint.dirpath,
         f'mutations_{task_cfg.min_mutant_dist}',
         f'percentile_{percentile}',
-        f'{smoothed}',
-         f'run_{timestamp}'
+        f'{smoothing_params}_smoothed',
+        f'{nbhd_params}',
+        f'{output_dir}'
     )
+    
     os.makedirs(ckpt_dir, exist_ok=True)
-
     callbacks_cfg.model_checkpoint.dirpath = ckpt_dir
     log.info(f'Model checkpoints being saved to: {ckpt_dir}')
     callbacks: List[Callback] = utils.instantiate_callbacks(callbacks_cfg)
@@ -105,7 +108,6 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
     with open(cfg_path, 'w') as f:
         OmegaConf.save(config=cfg, f=f.name)
 
-
     log.info("Starting training!")
     trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
 
@@ -116,7 +118,6 @@ def main(cfg: DictConfig) -> Optional[float]:
     # apply extra utilities
     # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
     utils.extras(cfg)
-
     # train the model
     train(cfg)
 

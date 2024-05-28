@@ -1,10 +1,12 @@
 task: AAV
 method: ggs 
-results_name: eval_run
+results_name: eval_run_new
 topk: 128
 gt_csv: ${paths.data_dir}/AAV/ground_truth.csv
 oracle_dir: ${paths.ckpt_dir}/AAV/mutations_0/percentile_0.0_1.0/
-ggs_samples_dir: ${paths.ckpt_dir}/AAV/mutations_6/percentile_0.2_0.4/smoothed/predictor/samples/IE_10
-predictor_dir: null
+ggs_samples_dir: null # needs to be filled in 
+baselines_samples_dir: null # may be filled in to compare with baselines
+predictor_dir: null #can be filled in to evaluate with a predictor (not fully tested)
 topk_sampling: greedy
-epoch_filter: null
+epoch_filter: 'last'
+

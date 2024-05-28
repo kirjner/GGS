@@ -15,20 +15,6 @@ from typing import List
 to_np = lambda x: x.cpu().detach().numpy()
 to_list = lambda x: to_np(x).tolist()
 
-
-def _mutagenesis_tensor(base_seq):
-    base_seq = torch.squeeze(base_seq)  # Remove batch dimension.
-    seq_len, vocab_len = base_seq.shape
-    # Create mutagenesis tensor
-    all_seqs = []
-    for i in range(seq_len):
-        for j in range(vocab_len):
-            new_seq = base_seq.clone()
-            new_seq[i][j] = 1
-            all_seqs.append(new_seq)
-    all_seqs = torch.stack(all_seqs)
-    return all_seqs
-
 class GwgPairSampler(torch.nn.Module):
     
     def __init__(
@@ -53,6 +39,8 @@ class GwgPairSampler(torch.nn.Module):
         self.num_current_src_seqs = 0
         self.gibbs_samples = gibbs_samples
         self._verbose = verbose
+        self.sampled = 0
+        self.accepted = 0
 
     def _setup_predictor(self, predictor_dir: str):
         # Load model weights.
@@ -71,6 +59,7 @@ class GwgPairSampler(torch.nn.Module):
 
     def tokenize_seqs(self, seqs):
         return self.gen_tokenizer.encode(seqs)
+    
 
     def _calc_local_diff(self, seq_one_hot):
         # Construct local difference
@@ -79,6 +68,7 @@ class GwgPairSampler(torch.nn.Module):
         delta_ij = gx - gx_cur
         return delta_ij
 
+    
     def _gibbs_sampler(self, seq_one_hot):
         delta_ij = self._calc_local_diff(seq_one_hot)
         delta_ij = delta_ij[0]
@@ -97,7 +87,8 @@ class GwgPairSampler(torch.nn.Module):
             mutated_seqs[(seq_idx, res_idx)] = aa_idx
             return mutated_seqs
         
-        return _gwg_sample 
+        return _gwg_sample
+
 
     def _make_one_hot(self, seq, differentiable=False):
         seq_one_hot = F.one_hot(seq, num_classes=self.num_tokens)
@@ -112,8 +103,8 @@ class GwgPairSampler(torch.nn.Module):
 
     def _decode(self, one_hot_seq):
         return self.predictor_tokenizer.decode(one_hot_seq)
-    
-    def _metropolis_hasting(
+
+    def _metropolis_hastings(
             self, mutants, source_one_hot, delta_score):
        
         source = torch.argmax(source_one_hot, dim=-1)
@@ -160,14 +151,14 @@ class GwgPairSampler(torch.nn.Module):
         all_mutated_scores = self._evaluate_one_hot(mutants)
         delta_score = all_mutated_scores - score
 
-        accept_mask = self._metropolis_hasting(
-            mutants, source_one_hot, delta_score)
+        accept_mask = self._metropolis_hastings(
+            mutants, source_one_hot, delta_score) 
         accepted_x = to_list(mutants[accept_mask])
         accepted_seq = [self._decode(x) for x in accepted_x]
         accepted_score = to_list(all_mutated_scores[accept_mask])
         return pd.DataFrame({
-            'mutant_sequences': accepted_seq,
-            'mutant_scores': accepted_score,
+            'mutant_sequence': accepted_seq,
+            'mutant_score': accepted_score,
         }), mutants[accept_mask]
 
     def compute_mutant_stats(self, source_seq, mutant_seqs):
@@ -176,16 +167,16 @@ class GwgPairSampler(torch.nn.Module):
         return num_mutated_res
 
     def forward(self, batch):
-        seqs = batch['sequences']
-
+        seqs = batch['sequence']
         #Tokenize
         tokenized_seqs = self.predictor_tokenizer.encode(seqs).to(self.device)
         total_num_seqs = len(tokenized_seqs)
 
         # Sweep over hyperparameters
         all_mutant_pairs = []
+        grand_total_num_proposals = 0
+        grand_total_num_accepts = 0
         for i, (real_seq, token_seq) in enumerate(zip(seqs, tokenized_seqs)):
-            start_time = time.time()
 
             # Cast as float to take gradients through
             seq_one_hot = self._make_one_hot(token_seq, differentiable=True)
@@ -194,7 +185,7 @@ class GwgPairSampler(torch.nn.Module):
             pred_score = self._evaluate_one_hot(token_seq[None]).item()
 
             # Construct Gibbs sampler
-            sampler = self._gibbs_sampler(seq_one_hot[None])
+            sampler = self._gibbs_sampler(seq_one_hot[None]) 
             seq_pairs = []
             total_num_proposals = 0
             all_proposed_mutants = []
@@ -204,6 +195,7 @@ class GwgPairSampler(torch.nn.Module):
             proposed_mutants = sampler()
             num_proposals = proposed_mutants.shape[0]
             total_num_proposals += num_proposals
+            grand_total_num_proposals += num_proposals
             proposed_num_edits = self.compute_mutant_stats(
                 token_seq, proposed_mutants)
             proposed_mutants = proposed_mutants[proposed_num_edits > 0]
@@ -217,8 +209,9 @@ class GwgPairSampler(torch.nn.Module):
             )
 
             all_accepted_mutants.append(to_np(accepted_mutants))
-            sample_outputs['source_sequences'] = real_seq
-            sample_outputs['source_scores'] = pred_score
+            grand_total_num_accepts += len(accepted_mutants)
+            sample_outputs['source_sequence'] = real_seq
+            sample_outputs['source_score'] = pred_score
 
             seq_pairs.append(sample_outputs)
             if self._verbose:
@@ -230,35 +223,16 @@ class GwgPairSampler(torch.nn.Module):
 
             if len(seq_pairs) > 0:
                 seq_pairs = pd.concat(seq_pairs).drop_duplicates(
-                    subset=['source_sequences', 'mutant_sequences'],
+                    subset=['source_sequence', 'mutant_sequence'],
                     ignore_index=True
                 )
                 all_mutant_pairs.append(seq_pairs)
-            if self._verbose:
-                elapsed_time = time.time() - start_time
-                num_new_pairs = len(seq_pairs)
-                all_proposed_mutants = np.concatenate(all_proposed_mutants, axis=0)
-                proposed_res_freq = np.mean(
-                    all_proposed_mutants != to_np(token_seq)[None], axis=0
-                ).round(decimals=2)
-                n_proposed = all_proposed_mutants.shape[0]
-
-                all_accepted_mutants = np.concatenate(all_accepted_mutants, axis=0)
-                accepted_res_freq = np.mean(
-                    all_accepted_mutants != to_np(token_seq)[None], axis=0).round(decimals=2)
-                n_accepted = all_accepted_mutants.shape[0]
-
-                print(
-                    f'Done with sequence {i+1}/{total_num_seqs} in {elapsed_time:.1f}s. '
-                    f'Accepted {num_new_pairs}/{total_num_proposals} ({num_new_pairs/total_num_proposals:.2f}) sequences. \n'
-                    f'Proposed sites (n={n_proposed}): {proposed_res_freq}. \n'
-                    f'Accepted sites (n={n_accepted}): {accepted_res_freq}.'
-                )
-
+        if self._verbose:
+            print("Epoch acceptance rate: ", grand_total_num_accepts / grand_total_num_proposals)
 
         if len(all_mutant_pairs) == 0:
             return None
         return pd.concat(all_mutant_pairs).drop_duplicates(
-            subset=['source_sequences', 'mutant_sequences'],
+            subset=['source_sequence', 'mutant_sequence'],
             ignore_index=True
-        )
+        ), grand_total_num_accepts / grand_total_num_proposals

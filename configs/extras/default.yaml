@@ -1,5 +1,5 @@
 # disable python warnings if they annoy you
-ignore_warnings: False
+ignore_warnings: True
 
 # ask user for tags if none are provided in the config
 enforce_tags: False

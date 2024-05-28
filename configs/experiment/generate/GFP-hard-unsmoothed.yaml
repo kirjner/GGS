@@ -1,5 +1,5 @@
-predictor_dir: ${paths.ckpt_dir}/GFP/mutations_7/percentile_0.1_0.3/unsmoothed/predictor
+predictor_dir: null # needs to be filled in by user
 temperature: 0.01
-gibbs_samples: 100
+gibbs_samples: 1000 # 1000 instead of 100 for unsmoothed
 verbose: False
 ckpt_name: last.ckpt

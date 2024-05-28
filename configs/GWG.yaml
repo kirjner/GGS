@@ -6,21 +6,23 @@ defaults:
   - _self_
   - paths: default.yaml
   - extras: default.yaml
-  - hydra: default.yaml
   - experiment: null # needs command line override
   - debug: null
   - optional local: default
 
 data:
-  csv_path: null # (!!) must be null
-  cluster_cutoff: 500
+  csv_path: null # must be null
+  cluster_cutoff: 128
   max_visits: 1
+  clustering: True
 
 run:
-  max_epochs: 22
-  run_name: run_${now:%Y-%m-%d}_${now:%H-%M-%S} #IE_${run.max_epochs}  -- use this name if you don't want the date, but instead the number of epochs
+  max_epochs: 10
+  run_name: temp-${experiment.temperature}-ngibbs-${experiment.gibbs_samples}-epochs-${run.max_epochs} #run-name can easily be changed
   debug: False
   seed: 1
+  save_cluster_centers: False
+  
 
 # task name, determines output directory path
 task_name: GWG
