@@ -2,7 +2,7 @@
 This codebase implements Gibbs sampling with Graph-based Smoothing v2 (GGS-v2). (v1: [arxiv](https://arxiv.org/abs/2307.00494))
 The trained predictors (smoothed and unsmoothed) for both AAV and GFP across difficulties that were used to generate the results in the main text of the paper are available in the 'ckpt' directory
 
-**NOTE1**: v1 of this codebase is available by cloning a previous commit. The current version is, however, a more streamlined implementation, and is recommended for use
+**NOTE1**: v1 of this codebase is available by cloning a previous commit. The current version is, however, a more streamlined implementation, and is recommended for use.
 
 **NOTE2**: If you experience any unexpected behavior, please open an issue or contact kirjner@mit.edu
 
@@ -24,7 +24,7 @@ cd GGS
 
 # Install and activate the conda environment from the environment.yaml file 
 # then setup the ggs package
-conda env create -f environment.yaml`
+conda env create -f environment.yaml
 conda activate ggs 
 pip install -e .
 ```
